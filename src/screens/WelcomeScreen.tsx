@@ -1,24 +1,24 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { CustomButton } from '../components/buttons/CustomButton';
-import { COLORS } from '../constants/colors';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
+import { Logo } from '../components/Logo';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'WelcomeScreen'>;
 
 export const WelcomeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
 
     return (
         <ImageBackground
-            source={require('../../girisekranresmi/girisekranresmi.jpeg')}
+            source={require('../assets/images/girisekranresmi.jpeg')}
             style={styles.container}
         >
             <View style={styles.overlay}>
                 <View style={styles.logoContainer}>
-                    <Text style={styles.logoText}>SocialHub</Text>
+                    <Logo size="medium" />
                 </View>
 
                 <View style={styles.contentContainer}>
@@ -28,12 +28,12 @@ export const WelcomeScreen: React.FC = () => {
                 <View style={styles.buttonContainer}>
                     <CustomButton
                         title="LOG IN / SIGN UP"
-                        onPress={() => navigation.navigate('Login')}
+                        onPress={() => navigation.navigate('LoginScreen')}
                         variant="primary"
                     />
                     <CustomButton
                         title="BROWSE FIRST"
-                        onPress={() => { }}
+                        onPress={() => navigation.navigate('HomeScreen')}
                         variant="secondary"
                     />
                 </View>
@@ -54,16 +54,6 @@ const styles = StyleSheet.create({
     logoContainer: {
         paddingTop: 40,
         paddingHorizontal: 10,
-    },
-    logoText: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#FFFFFF',
-        fontFamily: 'Inter-Bold',
-        letterSpacing: -0.5,
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
     },
     contentContainer: {
         flex: 1,
@@ -87,4 +77,6 @@ const styles = StyleSheet.create({
         gap: 16,
         marginBottom: 40,
     },
-}); 
+});
+
+export default WelcomeScreen; 

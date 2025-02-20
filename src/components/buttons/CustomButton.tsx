@@ -8,6 +8,7 @@ interface CustomButtonProps {
     variant?: 'primary' | 'secondary';
     style?: StyleProp<ViewStyle>;
     icon?: React.ReactNode;
+    disabled?: boolean;
 }
 
 export const CustomButton: React.FC<CustomButtonProps> = ({ 
@@ -16,11 +17,13 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
     variant = 'primary',
     style,
     icon,
+    disabled = false,
 }) => {
     const buttonStyles = [
         styles.button,
         variant === 'primary' && styles.primaryButton,
         variant === 'secondary' && styles.secondaryButton,
+        disabled && styles.disabledButton,
         style,
     ];
 
@@ -28,10 +31,15 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
         styles.buttonText,
         variant === 'primary' && styles.primaryText,
         variant === 'secondary' && styles.secondaryText,
+        disabled && styles.disabledText,
     ];
 
     return (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+        <TouchableOpacity 
+            onPress={onPress} 
+            activeOpacity={0.8} 
+            disabled={disabled}
+        >
             <View style={buttonStyles}>
                 {icon}
                 <Text style={textStyles}>{title}</Text>
@@ -69,5 +77,11 @@ const styles = StyleSheet.create({
     secondaryText: {
         color: COLORS.textPrimary,
         fontWeight: '600',
+    },
+    disabledButton: {
+        backgroundColor: COLORS.disabled,
+    },
+    disabledText: {
+        color: COLORS.disabledText,
     },
 }); 

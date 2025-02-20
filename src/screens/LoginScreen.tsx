@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground, Animated } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground, Animated, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { COLORS } from '../constants/colors';
 import { CustomButton } from '../components/buttons/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useAuth } from '../context/AuthContext';
+import { theme } from '../theme';
+import { Logo } from '../components/Logo';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'LoginScreen'>;
 
-export const LoginScreen: React.FC = () => {
+const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigation = useNavigation<NavigationProp>();
     const buttonScale = new Animated.Value(1);
+    const { login } = useAuth();
 
     const handleButtonPress = () => {
+        Keyboard.dismiss();
         Animated.sequence([
             Animated.timing(buttonScale, {
                 toValue: 0.95,
@@ -35,87 +41,136 @@ export const LoginScreen: React.FC = () => {
         transform: [{ scale: buttonScale }]
     };
 
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Hata', 'Lütfen email ve şifrenizi giriniz.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const success = await login(email, password);
+            if (!success) {
+                Alert.alert('Hata', 'Email veya şifre hatalı.');
+            }
+        } catch (error) {
+            Alert.alert('Hata', 'Giriş yapılırken bir hata oluştu.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <ImageBackground
-            source={require('../../girisekranresmi/girisekranresmi.jpeg')}
-            style={styles.container}
-        >
-            <View style={styles.overlay}>
-                <TouchableOpacity
-                    style={styles.logoContainer}
-                    onPress={() => navigation.navigate('Welcome')}
-                    activeOpacity={0.7}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.container}>
+                <ImageBackground
+                    source={require('../assets/images/girisekranresmi.jpeg')}
+                    style={styles.container}
                 >
-                    <Text style={styles.logoText}>SocialHub</Text>
-                </TouchableOpacity>
+                    <View style={styles.overlay}>
+                        <TouchableOpacity
+                            style={styles.logoContainer}
+                            onPress={() => {
+                                Keyboard.dismiss();
+                                navigation.navigate('WelcomeScreen');
+                            }}
+                            activeOpacity={0.7}
+                        >
+                            <Logo size="medium" />
+                        </TouchableOpacity>
 
-                <View style={styles.contentContainer}>
-                    <Text style={styles.title}>Join a Community That{'\n'}Shares Your Passions!</Text>
-                    <Text style={styles.subtitle}>Discover new hobbies, meet like-minded people, and join events around you.</Text>
+                        <ScrollView 
+                            contentContainerStyle={styles.scrollViewContent}
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <View style={styles.contentContainer}>
+                                <Text style={styles.title}>Join a Community That{'\n'}Shares Your Passions!</Text>
+                                <Text style={styles.subtitle}>Discover new hobbies, meet like-minded people, and join events around you.</Text>
 
-                    <View style={styles.formContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email address"
-                            placeholderTextColor={COLORS.textSecondary}
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            selectionColor={COLORS.primary}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Password"
-                            placeholderTextColor={COLORS.textSecondary}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                            selectionColor={COLORS.primary}
-                        />
+                                <View style={styles.formContainer}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Email address"
+                                        placeholderTextColor={COLORS.textSecondary}
+                                        value={email}
+                                        onChangeText={setEmail}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        selectionColor={COLORS.primary}
+                                        returnKeyType="next"
+                                        blurOnSubmit={false}
+                                    />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Password"
+                                        placeholderTextColor={COLORS.textSecondary}
+                                        value={password}
+                                        onChangeText={setPassword}
+                                        secureTextEntry
+                                        selectionColor={COLORS.primary}
+                                        returnKeyType="done"
+                                        onSubmitEditing={Keyboard.dismiss}
+                                    />
 
-                        <View style={styles.rememberContainer}>
-                            <TouchableOpacity
-                                style={styles.checkbox}
-                                onPress={() => setRememberMe(!rememberMe)}
-                            >
-                                <View style={[styles.checkboxInner, rememberMe && styles.checkboxChecked]} />
-                            </TouchableOpacity>
-                            <Text style={styles.rememberText}>Remember me</Text>
-                            <TouchableOpacity style={styles.forgotPassword}>
-                                <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-                            </TouchableOpacity>
-                        </View>
+                                    <View style={styles.rememberContainer}>
+                                        <TouchableOpacity
+                                            style={styles.checkbox}
+                                            onPress={() => setRememberMe(!rememberMe)}
+                                        >
+                                            <View style={[styles.checkboxInner, rememberMe && styles.checkboxChecked]} />
+                                        </TouchableOpacity>
+                                        <Text style={styles.rememberText}>Remember me</Text>
+                                        <TouchableOpacity 
+                                            style={styles.forgotPassword}
+                                            onPress={() => {
+                                                Keyboard.dismiss();
+                                                navigation.navigate('ResetPasswordScreen');
+                                            }}
+                                        >
+                                            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+                                        </TouchableOpacity>
+                                    </View>
 
-                        <Animated.View style={[styles.signInButton, buttonAnimatedStyle]}>
-                            <CustomButton
-                                title="Sign In"
-                                onPress={handleButtonPress}
-                                variant="primary"
-                            />
-                        </Animated.View>
+                                    <Animated.View style={[styles.signInButton, buttonAnimatedStyle]}>
+                                        <CustomButton
+                                            title={loading ? "" : "Sign In"}
+                                            onPress={handleLogin}
+                                            variant="primary"
+                                            disabled={loading}
+                                            icon={loading ? <ActivityIndicator color={COLORS.textPrimary} /> : undefined}
+                                        />
+                                    </Animated.View>
 
-                        <View style={styles.signupContainer}>
-                            <Text style={styles.signupText}>Don't have an account? </Text>
-                            <TouchableOpacity>
-                                <Text style={styles.signupLink}>Sign Up</Text>
-                            </TouchableOpacity>
-                        </View>
+                                    <View style={styles.signupContainer}>
+                                        <Text style={styles.signupText}>Don't have an account? </Text>
+                                        <TouchableOpacity 
+                                            onPress={() => {
+                                                Keyboard.dismiss();
+                                                navigation.navigate('RegisterScreen');
+                                            }}
+                                        >
+                                            <Text style={styles.signupLink}>Sign Up</Text>
+                                        </TouchableOpacity>
+                                    </View>
 
-                        <View style={styles.googleContainer}>
-                            <Animated.View style={[styles.googleButton, buttonAnimatedStyle]}>
-                                <CustomButton
-                                    title="Continue with Google"
-                                    onPress={handleButtonPress}
-                                    variant="secondary"
-                                    icon={<Icon name="google" size={20} color={COLORS.textPrimary} style={styles.googleIcon} />}
-                                />
-                            </Animated.View>
-                        </View>
+                                    <View style={styles.googleContainer}>
+                                        <Animated.View style={[styles.googleButton, buttonAnimatedStyle]}>
+                                            <CustomButton
+                                                title="Continue with Google"
+                                                onPress={handleButtonPress}
+                                                variant="secondary"
+                                                icon={<Icon name="google" size={20} color={COLORS.textPrimary} style={styles.googleIcon} />}
+                                            />
+                                        </Animated.View>
+                                    </View>
+                                </View>
+                            </View>
+                        </ScrollView>
                     </View>
-                </View>
+                </ImageBackground>
             </View>
-        </ImageBackground>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -129,19 +184,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.4)',
         padding: 20,
     },
+    scrollViewContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+    },
     logoContainer: {
         paddingTop: 40,
         paddingHorizontal: 10,
-    },
-    logoText: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#FFFFFF',
-        fontFamily: 'Inter-Bold',
-        letterSpacing: -0.5,
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
     },
     contentContainer: {
         flex: 1,
@@ -282,4 +331,11 @@ const styles = StyleSheet.create({
     googleIcon: {
         marginRight: 8,
     },
+    buttonText: {
+        color: theme.colors.white,
+        fontSize: theme.typography.fontSize.md,
+        fontFamily: theme.typography.fontFamily.semiBold,
+    },
 });
+
+export default LoginScreen;

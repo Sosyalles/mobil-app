@@ -1,0 +1,44 @@
+# UI/UX Development Guidelines for Mobile App
+
+## 1. Modular Structure  
+- UI components should be designed as reusable and modular elements.  
+- Use a **component-based** architecture for scalability and consistency.  
+- Keep styling and functionality separate for maintainability.  
+
+## 2. Layout & Design  
+- Follow a **clean, minimal, and modern design** approach.  
+- Use a **mobile-first** design principle.  
+- Ensure a **consistent margin, padding, and spacing system** across all screens.  
+- Implement a **fluid grid system** for flexible layouts.  
+
+## 3. Typography & Colors  
+- Use a **fun and inviting font** (e.g., Poppins, Baloo, Quicksand).  
+- Maintain **aesthetic contrast** between text and background.  
+- **Primary Colors:** Warm Orange (#FF7F50), Soft Gray (#6D6D6D), Cream (#FFF5E1).  
+
+## 4. Components & UI Elements  
+- **Navbar:** Contains logo, notifications, and search bar.  
+- **Hero Section:** Eye-catching image with a short tagline.  
+- **Categories Section:** Grid or horizontal scrollable buttons.  
+- **Event Cards:** Display event details (name, date, participation).  
+- **Footer Navigation:** Home, Explore, Messages, Profile.  
+
+## 5. User Interaction  
+- Use **smooth animations** and **transitions** for a fluid experience.  
+- Provide **haptic feedback** for interactive elements.  
+- Buttons should have **press states, hover states, and disabled states**.  
+
+## 6. Performance & Optimization  
+- Optimize **image sizes and assets** for better performance.  
+- Use **lazy loading** for non-essential UI elements.  
+- Keep UI responsive for **different screen sizes** and **devices**.  
+
+## 7. Accessibility & UX  
+- Ensure **readability** with proper text sizes and contrast.  
+- Implement **accessible color schemes** for visually impaired users.  
+- Buttons and touch areas should be **large enough** for easy interaction.  
+
+## 8. Navigation & Flow  
+- Keep navigation **intuitive and easy to use**.  
+- Use a **bottom navigation bar** for quick access to main sections.  
+- Ensure seamless **screen transitions** without breaking the user journey.  

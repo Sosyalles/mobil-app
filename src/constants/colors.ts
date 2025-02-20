@@ -24,4 +24,8 @@ export const COLORS = {
     
     // Border Colors
     border: '#E0E0E0',       // Açık gri - Kenarlıklar için
+
+    // Disabled Colors
+    disabled: '#E0E0E0',     // Açık gri - Devre dışı butonlar için
+    disabledText: '#999999', // Koyu gri - Devre dışı metin için
 } as const; 

@@ -1,32 +1,41 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp, View } from 'react-native';
 import { COLORS } from '../../constants/colors';
 
 interface CustomButtonProps {
     title: string;
     onPress: () => void;
-    variant: 'primary' | 'secondary';
+    variant?: 'primary' | 'secondary';
+    style?: StyleProp<ViewStyle>;
+    icon?: React.ReactNode;
 }
 
-export const CustomButton: React.FC<CustomButtonProps> = ({
-    title,
+export const CustomButton: React.FC<CustomButtonProps> = ({ 
+    title, 
     onPress,
-    variant
+    variant = 'primary',
+    style,
+    icon,
 }) => {
+    const buttonStyles = [
+        styles.button,
+        variant === 'primary' && styles.primaryButton,
+        variant === 'secondary' && styles.secondaryButton,
+        style,
+    ];
+
+    const textStyles = [
+        styles.buttonText,
+        variant === 'primary' && styles.primaryText,
+        variant === 'secondary' && styles.secondaryText,
+    ];
+
     return (
-        <TouchableOpacity
-            style={[
-                styles.button,
-                variant === 'primary' ? styles.primaryButton : styles.secondaryButton
-            ]}
-            onPress={onPress}
-        >
-            <Text style={[
-                styles.buttonText,
-                variant === 'primary' ? styles.primaryText : styles.secondaryText
-            ]}>
-                {title}
-            </Text>
+        <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+            <View style={buttonStyles}>
+                {icon}
+                <Text style={textStyles}>{title}</Text>
+            </View>
         </TouchableOpacity>
     );
 };
@@ -34,26 +43,31 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
 const styles = StyleSheet.create({
     button: {
         paddingVertical: 16,
+        paddingHorizontal: 24,
         borderRadius: 30,
         alignItems: 'center',
         justifyContent: 'center',
+        flexDirection: 'row',
     },
     primaryButton: {
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.primary,
     },
     secondaryButton: {
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        borderColor: COLORS.white,
+        backgroundColor: COLORS.background,
+        borderWidth: 1,
+        borderColor: COLORS.textPrimary,
     },
     buttonText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'Inter-SemiBold',
+        letterSpacing: -0.2,
     },
     primaryText: {
-        color: COLORS.background,
+        color: COLORS.textPrimary,
+        fontWeight: '600',
     },
     secondaryText: {
-        color: COLORS.white,
+        color: COLORS.textPrimary,
+        fontWeight: '600',
     },
 }); 

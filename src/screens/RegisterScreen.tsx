@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    TextInput, 
-    TouchableOpacity, 
-    ImageBackground, 
-    Animated, 
-    Alert, 
-    Keyboard, 
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    ImageBackground,
+    Animated,
+    Alert,
+    Keyboard,
     TouchableWithoutFeedback,
     ScrollView,
-    Platform 
+    Platform
 } from 'react-native';
 import { COLORS } from '../constants/colors';
 import { CustomButton } from '../components/buttons/CustomButton';
@@ -20,6 +20,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Logo } from '../components/Logo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'RegisterScreen'>;
 
@@ -120,7 +121,7 @@ export const RegisterScreen: React.FC = () => {
                             <Logo size="medium" />
                         </TouchableOpacity>
 
-                        <ScrollView 
+                        <ScrollView
                             contentContainerStyle={styles.scrollViewContent}
                             keyboardShouldPersistTaps="handled"
                             showsVerticalScrollIndicator={false}
@@ -192,14 +193,14 @@ export const RegisterScreen: React.FC = () => {
                                             returnKeyType="next"
                                             blurOnSubmit={false}
                                         />
-                                        <TouchableOpacity 
-                                            style={styles.passwordVisibilityIcon}
+                                        <TouchableOpacity
+                                            style={styles.eyeIcon}
                                             onPress={() => setPasswordVisible(!passwordVisible)}
                                         >
-                                            <Icon 
-                                                name={passwordVisible ? 'eye-slash' : 'eye'} 
-                                                size={20} 
-                                                color={COLORS.textSecondary} 
+                                            <Ionicons
+                                                name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+                                                size={24}
+                                                color={COLORS.textSecondary}
                                             />
                                         </TouchableOpacity>
                                     </View>
@@ -226,7 +227,7 @@ export const RegisterScreen: React.FC = () => {
 
                                     <View style={styles.loginContainer}>
                                         <Text style={styles.loginText}>Already have an account? </Text>
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             onPress={() => {
                                                 Keyboard.dismiss();
                                                 navigation.navigate('LoginScreen');
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
     },
     subtitle: {
-        fontSize: 16,  
+        fontSize: 16,
         color: '#E6E6E6',
         textAlign: 'center',
         marginBottom: 40,
@@ -305,16 +306,18 @@ const styles = StyleSheet.create({
     formContainer: {
         width: '100%',
         paddingHorizontal: 20,
+        gap: 16,
     },
     nameContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        gap: 16,
+        marginBottom: 0,
     },
     input: {
         backgroundColor: '#F5F2EA',
         borderRadius: 30,
         padding: 15,
-        marginBottom: 16,
         fontSize: 16,
         fontFamily: 'Inter-Regular',
         color: '#1E1E1E',
@@ -327,33 +330,38 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+        marginBottom: 0,
     },
     halfInput: {
-        width: '48%',
+        flex: 1,
     },
     passwordContainer: {
         position: 'relative',
-        justifyContent: 'center',
+        width: '100%',
+        marginBottom: 0,
     },
     passwordInput: {
-        paddingRight: 40,
+        flex: 1,
+        paddingRight: 50,
     },
-    passwordVisibilityIcon: {
+    eyeIcon: {
         position: 'absolute',
         right: 15,
-        top: '50%',
-        marginTop: -10, // Half of the icon's height to center it
+        paddingHorizontal: 10,
+        height: 56,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     signUpButton: {
         borderRadius: 30,
         backgroundColor: '#A8E0D1',
-        marginTop: 10,
+        marginTop: 16,
     },
     loginContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 8,
     },
     loginText: {
         color: '#FFFFFF',
@@ -376,7 +384,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 2,
     },
     googleContainer: {
-        marginTop: 20,
+        marginTop: 8,
     },
     googleButton: {
         borderRadius: 30,

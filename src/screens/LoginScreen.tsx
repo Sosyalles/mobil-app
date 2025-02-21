@@ -9,12 +9,14 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useAuth } from '../context/AuthContext';
 import { theme } from '../theme';
 import { Logo } from '../components/Logo';
+import { Ionicons } from '@expo/vector-icons';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'LoginScreen'>;
 
 const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation<NavigationProp>();
@@ -79,7 +81,7 @@ const LoginScreen: React.FC = () => {
                             <Logo size="medium" />
                         </TouchableOpacity>
 
-                        <ScrollView 
+                        <ScrollView
                             contentContainerStyle={styles.scrollViewContent}
                             keyboardShouldPersistTaps="handled"
                             showsVerticalScrollIndicator={false}
@@ -101,17 +103,29 @@ const LoginScreen: React.FC = () => {
                                         returnKeyType="next"
                                         blurOnSubmit={false}
                                     />
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Password"
-                                        placeholderTextColor={COLORS.textSecondary}
-                                        value={password}
-                                        onChangeText={setPassword}
-                                        secureTextEntry
-                                        selectionColor={COLORS.primary}
-                                        returnKeyType="done"
-                                        onSubmitEditing={Keyboard.dismiss}
-                                    />
+                                    <View style={styles.passwordContainer}>
+                                        <TextInput
+                                            style={styles.passwordInput}
+                                            placeholder="Password"
+                                            placeholderTextColor={COLORS.textSecondary}
+                                            value={password}
+                                            onChangeText={setPassword}
+                                            secureTextEntry={!showPassword}
+                                            selectionColor={COLORS.primary}
+                                            returnKeyType="done"
+                                            onSubmitEditing={Keyboard.dismiss}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.eyeIcon}
+                                            onPress={() => setShowPassword(!showPassword)}
+                                        >
+                                            <Ionicons
+                                                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                                                size={24}
+                                                color={COLORS.textSecondary}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
 
                                     <View style={styles.rememberContainer}>
                                         <TouchableOpacity
@@ -121,7 +135,7 @@ const LoginScreen: React.FC = () => {
                                             <View style={[styles.checkboxInner, rememberMe && styles.checkboxChecked]} />
                                         </TouchableOpacity>
                                         <Text style={styles.rememberText}>Remember me</Text>
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             style={styles.forgotPassword}
                                             onPress={() => {
                                                 Keyboard.dismiss();
@@ -144,7 +158,7 @@ const LoginScreen: React.FC = () => {
 
                                     <View style={styles.signupContainer}>
                                         <Text style={styles.signupText}>Don't have an account? </Text>
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             onPress={() => {
                                                 Keyboard.dismiss();
                                                 navigation.navigate('RegisterScreen');
@@ -210,7 +224,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
     },
     subtitle: {
-        fontSize: 16,  
+        fontSize: 16,
         color: '#E6E6E6',
         textAlign: 'center',
         marginBottom: 40,
@@ -335,6 +349,37 @@ const styles = StyleSheet.create({
         color: theme.colors.white,
         fontSize: theme.typography.fontSize.md,
         fontFamily: theme.typography.fontFamily.semiBold,
+    },
+    passwordContainer: {
+        position: 'relative',
+        width: '100%',
+        marginBottom: 16,
+    },
+    passwordInput: {
+        backgroundColor: '#F5F2EA',
+        borderRadius: 30,
+        padding: 15,
+        paddingRight: 50,
+        fontSize: 16,
+        fontFamily: 'Inter-Regular',
+        color: '#1E1E1E',
+        letterSpacing: -0.2,
+        shadowColor: '#000000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 15,
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 10,
     },
 });
 

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface LogoProps {
@@ -7,6 +7,34 @@ interface LogoProps {
 }
 
 export const Logo: React.FC<LogoProps> = ({ size = 'medium' }) => {
+  const bounceAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const startBounceAnimation = () => {
+      Animated.sequence([
+        Animated.timing(bounceAnim, {
+          toValue: -10,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bounceAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Animasyonu 2 saniye sonra tekrar başlat
+        setTimeout(startBounceAnimation, 2000);
+      });
+    };
+
+    startBounceAnimation();
+
+    return () => {
+      bounceAnim.setValue(0);
+    };
+  }, []);
+
   // Standardize the size to medium
   const fontSize = 28;
   const iconSize = 20;
@@ -16,12 +44,13 @@ export const Logo: React.FC<LogoProps> = ({ size = 'medium' }) => {
       <View style={styles.textContainer}>
         <Text style={[styles.textOrange, { fontSize }]}>Social</Text>
         <Text style={[styles.textGray, { fontSize }]}>Hub</Text>
-        <Ionicons 
-          name="flash" 
-          size={iconSize} 
-          color="#FF7F50" 
-          style={styles.icon}
-        />
+        <Animated.View style={[styles.iconContainer, { transform: [{ translateY: bounceAnim }] }]}>
+          <Ionicons
+            name="flash"
+            size={iconSize}
+            color="#FF7F50"
+          />
+        </Animated.View>
       </View>
     </View>
   );
@@ -48,7 +77,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     letterSpacing: -0.5,
   },
-  icon: {
+  iconContainer: {
     marginLeft: 1,
   },
 }); 

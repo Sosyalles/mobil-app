@@ -95,6 +95,39 @@ const HomePage: React.FC = () => {
     },
   ];
 
+  const technoEvents = [
+    {
+      id: 1,
+      title: 'Techno Night',
+      date: '30 Mart 2024',
+      image: require('../assets/images/teknoloji.jpeg'),
+    },
+    {
+      id: 2,
+      title: 'Electronic Fest',
+      date: '31 Mart 2024',
+      image: require('../assets/images/teknoloji.jpeg'),
+    },
+    {
+      id: 3,
+      title: 'Underground Party',
+      date: '1 Nisan 2024',
+      image: require('../assets/images/teknoloji.jpeg'),
+    },
+    {
+      id: 4,
+      title: 'Deep House Night',
+      date: '2 Nisan 2024',
+      image: require('../assets/images/teknoloji.jpeg'),
+    },
+    {
+      id: 5,
+      title: 'EDM Festival',
+      date: '3 Nisan 2024',
+      image: require('../assets/images/teknoloji.jpeg'),
+    },
+  ];
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -182,6 +215,32 @@ const HomePage: React.FC = () => {
                   <View style={styles.eventContent}>
                     <Text style={styles.eventTitle}>{event.title}</Text>
                     <Text style={styles.eventDate}>{event.date}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Techno Events */}
+        <View style={styles.eventsSection}>
+          <Text style={styles.sectionTitle}>Techno</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.eventsScrollContent}
+          >
+            {technoEvents.map((event) => (
+              <TouchableOpacity key={event.id} style={styles.eventCard}>
+                <Image
+                  source={event.image}
+                  style={styles.eventImage}
+                  resizeMode="cover"
+                />
+                <View style={[styles.eventOverlay, styles.technoOverlay]}>
+                  <View style={[styles.eventContent, styles.technoContent]}>
+                    <Text style={[styles.eventTitle, styles.technoTitle]}>{event.title}</Text>
+                    <Text style={[styles.eventDate, styles.technoDate]}>{event.date}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -479,6 +538,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     textAlign: 'center',
+  },
+  technoOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  technoContent: {
+    backgroundColor: 'rgba(0,0,0,0.8)',
+  },
+  technoTitle: {
+    color: '#FFFFFF',
+  },
+  technoDate: {
+    color: '#CCCCCC',
   },
 });
 

@@ -142,6 +142,8 @@ export const RegisterScreen: React.FC = () => {
                                             selectionColor={COLORS.primary}
                                             returnKeyType="next"
                                             blurOnSubmit={false}
+                                            maxLength={20}
+                                            numberOfLines={1}
                                         />
                                         <TextInput
                                             style={[styles.input, styles.halfInput]}
@@ -153,6 +155,8 @@ export const RegisterScreen: React.FC = () => {
                                             selectionColor={COLORS.primary}
                                             returnKeyType="next"
                                             blurOnSubmit={false}
+                                            maxLength={20}
+                                            numberOfLines={1}
                                         />
                                     </View>
 
@@ -166,6 +170,8 @@ export const RegisterScreen: React.FC = () => {
                                         selectionColor={COLORS.primary}
                                         returnKeyType="next"
                                         blurOnSubmit={false}
+                                        maxLength={20}
+                                        numberOfLines={1}
                                     />
 
                                     <TextInput
@@ -179,6 +185,8 @@ export const RegisterScreen: React.FC = () => {
                                         selectionColor={COLORS.primary}
                                         returnKeyType="next"
                                         blurOnSubmit={false}
+                                        maxLength={50}
+                                        numberOfLines={1}
                                     />
 
                                     <View style={styles.passwordContainer}>
@@ -192,6 +200,8 @@ export const RegisterScreen: React.FC = () => {
                                             selectionColor={COLORS.primary}
                                             returnKeyType="next"
                                             blurOnSubmit={false}
+                                            maxLength={30}
+                                            numberOfLines={1}
                                         />
                                         <TouchableOpacity
                                             style={styles.eyeIcon}
@@ -215,6 +225,8 @@ export const RegisterScreen: React.FC = () => {
                                         selectionColor={COLORS.primary}
                                         returnKeyType="done"
                                         onSubmitEditing={Keyboard.dismiss}
+                                        maxLength={30}
+                                        numberOfLines={1}
                                     />
 
                                     <Animated.View style={[styles.signUpButton, buttonAnimatedStyle]}>
@@ -331,9 +343,11 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 3,
         marginBottom: 0,
+        overflow: 'hidden',
     },
     halfInput: {
         flex: 1,
+        maxWidth: '48%',
     },
     passwordContainer: {
         position: 'relative',

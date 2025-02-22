@@ -170,7 +170,7 @@ const HomePage: React.FC = () => {
             <Text style={styles.heroTitle}>Hobileriniz artık{'\n'}daha yakın!</Text>
             <CustomButton
               title="Keşfetmeye Başla"
-              onPress={() => { }}
+              onPress={() => navigation.navigate('DiscoverScreen')}
               variant="primary"
               style={styles.heroButton}
             />
@@ -185,7 +185,7 @@ const HomePage: React.FC = () => {
               <TouchableOpacity
                 key={index}
                 style={styles.categoryItem}
-                onPress={() => { }}
+                onPress={() => navigation.navigate('DiscoverScreen')}
               >
                 <View style={[styles.categoryIconContainer, { backgroundColor: category.bgColor }]}>
                   <Ionicons name={category.icon} size={24} color="#FF9F4A" />

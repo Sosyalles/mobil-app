@@ -7,6 +7,9 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 import HomePage from '../screens/HomePage';
 import DiscoverScreen from '../screens/DiscoverScreen';
+import CreateEventScreen from '../screens/CreateEventScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import MessagesScreen from '../screens/MessagesScreen';
 import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -17,6 +20,7 @@ export const RootNavigator = () => {
             <Stack.Navigator
                 screenOptions={{
                     headerShown: false,
+                    animation: 'none',
                 }}
             >
                 <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
@@ -25,7 +29,10 @@ export const RootNavigator = () => {
                 <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
                 <Stack.Screen name="HomeScreen" component={HomePage} />
                 <Stack.Screen name="DiscoverScreen" component={DiscoverScreen} />
+                <Stack.Screen name="CreateEventScreen" component={CreateEventScreen} />
+                <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+                <Stack.Screen name="MessagesScreen" component={MessagesScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );
-}; 
+};

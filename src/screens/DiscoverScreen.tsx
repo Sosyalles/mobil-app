@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,14 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Keyboard,
-  FlatList
+  FlatList,
+  RefreshControl
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { Event as DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import turkishProvinces from '../data/turkish_provinces.json';
+import BottomNavigation from '../components/BottomNavigation';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -91,6 +94,8 @@ const popularEvents: Event[] = [
 ];
 
 const DiscoverScreen = () => {
+  const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
@@ -101,6 +106,15 @@ const DiscoverScreen = () => {
   const [isDateModalVisible, setDateModalVisible] = useState(false);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate data fetching
+    setTimeout(() => {
+      // Here you would typically fetch new data
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const filteredEvents = useMemo(() => {
     return popularEvents.filter(event => 
@@ -346,73 +360,106 @@ const DiscoverScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#6D6D6D" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for an event, artist or venue"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#6D6D6D"
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={20} color="#6D6D6D" />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.filterContainer}
-      >
-        <DateButton />
-        <LocationButton />
-      </ScrollView>
-
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.categoriesContainer}
-      >
-        {categories.map((category) => (
-          <CategoryCard 
-            key={category.id} 
-            name={category.name} 
-            icon={category.icon}
-            color={category.color}
-            isSelected={selectedCategory === category.name}
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#FF7F50']}
+            tintColor={'#FF7F50'}
+            title={'Yenileniyor...'}
+            titleColor={'#FF7F50'}
+            progressViewOffset={50}
           />
-        ))}
-      </ScrollView>
-
-      <View style={styles.resultCountContainer}>
-        <Text style={styles.resultCountText}>
-          {filteredEvents.length} Events Found
-        </Text>
-      </View>
-
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
-        style={styles.eventsContainer}
+        }
       >
-        {filteredEvents.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </ScrollView>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#6D6D6D" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search for an event, artist or venue"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor="#6D6D6D"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color="#6D6D6D" />
+              </TouchableOpacity>
+            )}
+          </View>
 
-      <DateSelectionModal />
-      <LocationModal />
-    </SafeAreaView>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            style={styles.filterContainer}
+          >
+            <DateButton />
+            <LocationButton />
+          </ScrollView>
+
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            style={styles.categoriesContainer}
+          >
+            {categories.map((category) => (
+              <CategoryCard 
+                key={category.id} 
+                name={category.name} 
+                icon={category.icon}
+                color={category.color}
+                isSelected={selectedCategory === category.name}
+              />
+            ))}
+          </ScrollView>
+
+          <View style={styles.resultCountContainer}>
+            <Text style={styles.resultCountText}>
+              {filteredEvents.length} Events Found
+            </Text>
+          </View>
+
+          <ScrollView 
+            showsVerticalScrollIndicator={false} 
+            style={styles.eventsContainer}
+          >
+            {filteredEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </ScrollView>
+
+          <DateSelectionModal />
+          <LocationModal />
+        </SafeAreaView>
+      </ScrollView>
+      <View style={styles.bottomNavigationContainer}>
+        <BottomNavigation />
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
+  },
+  bottomNavigationContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  scrollViewContent: {
+    paddingBottom: 20,
   },
   searchContainer: {
     flexDirection: 'row',

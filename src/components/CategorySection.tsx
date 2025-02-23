@@ -3,26 +3,30 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 
-const CATEGORIES = [
+const CATEGORIES: {
+  id: string;
+  title: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
   {
     id: '1',
     title: 'Oyunlar',
-    icon: 'game-controller-outline',
+    icon: 'game-controller',
   },
   {
     id: '2',
     title: 'Yemek',
-    icon: 'restaurant-outline',
+    icon: 'restaurant',
   },
   {
     id: '3',
     title: 'Müzik',
-    icon: 'musical-notes-outline',
+    icon: 'musical-notes',
   },
   {
     id: '4',
     title: 'Gruplar',
-    icon: 'people-outline',
+    icon: 'people',
   },
 ];
 

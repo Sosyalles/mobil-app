@@ -7,4 +7,6 @@ export type RootStackParamList = {
   EventsScreen?: undefined;
   ProfileScreen?: undefined;
   DiscoverScreen: undefined;
+  CreateEventScreen: undefined;
+  MessagesScreen: undefined;
 }; 

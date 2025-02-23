@@ -18,6 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
+import BottomNavigation from '../components/BottomNavigation';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -249,43 +250,16 @@ const HomePage: React.FC = () => {
         </View>
       </Animated.ScrollView>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="home" size={24} color="#FF9F4A" />
-          <Text style={[styles.navLabel, styles.activeNavLabel]}>Ana Sayfa</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="compass-outline" size={24} color="#999999" />
-          <Text style={styles.navLabel}>Keşfet</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => {
-            if (!isAuthenticated) {
-              navigation.navigate('WelcomeScreen');
-            } else {
-              // TODO: Mesajlar sayfasına yönlendir
-            }
-          }}
-        >
-          <Ionicons name="chatbubbles-outline" size={24} color="#999999" />
-          <Text style={styles.navLabel}>Mesajlar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => {
-            if (!isAuthenticated) {
-              navigation.navigate('WelcomeScreen');
-            } else {
-              // TODO: Profil sayfasına yönlendir
-            }
-          }}
-        >
-          <Ionicons name="person-outline" size={24} color="#999999" />
-          <Text style={styles.navLabel}>Profil</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Floating Action Button */}
+      <TouchableOpacity 
+        style={styles.fabButton}
+        onPress={() => {
+          // Directly navigate to CreateEventScreen without authentication check
+          navigation.navigate('CreateEventScreen');
+        }}
+      >
+        <Ionicons name="add" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
 
       {/* Login Banner */}
       <Animated.View
@@ -310,6 +284,9 @@ const HomePage: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Animated.View>
+      <View style={styles.bottomNavigationContainer}>
+        <BottomNavigation />
+      </View>
     </View>
   );
 };
@@ -317,7 +294,8 @@ const HomePage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.background,
+    position: 'relative',
   },
   header: {
     flexDirection: 'row',
@@ -355,6 +333,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingBottom: 60,
   },
   heroSection: {
     marginHorizontal: 16,
@@ -477,27 +456,6 @@ const styles = StyleSheet.create({
     color: '#666666',
     fontFamily: 'Inter-Regular',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navLabel: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 4,
-    fontFamily: 'Inter-Regular',
-  },
-  activeNavLabel: {
-    color: '#FF9F4A',
-    fontFamily: 'Inter-Medium',
-  },
   loginBanner: {
     position: 'absolute',
     bottom: 70,
@@ -550,6 +508,31 @@ const styles = StyleSheet.create({
   },
   technoDate: {
     color: '#CCCCCC',
+  },
+  fabButton: {
+    position: 'absolute',
+    bottom: 80,
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FF7F50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  bottomNavigationContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
   },
 });
 

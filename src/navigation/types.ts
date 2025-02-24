@@ -8,4 +8,4 @@ export type RootStackParamList = {
   MessagesScreen: undefined;
   EventsScreen?: undefined;
   ProfileScreen?: undefined;
-}; 
+};

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Alert } from 'react-native';
 import { CustomButton } from '../components/buttons/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -8,8 +8,69 @@ import { Logo } from '../components/Logo';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'WelcomeScreen'>;
 
+// API istekleri için kullanılacak fonksiyonlar
+const API_URL = 'https://api.example.com'; // API URL'inizi buraya ekleyin
+
+// Kullanıcı kaydı için fonksiyon
+const registerUser = async (userData: { email: string; password: string; name: string }) => {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Kayıt işlemi başarısız oldu');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Kayıt hatası:', error);
+        throw error;
+    }
+};
+
+// Kullanıcı girişi için fonksiyon
+const loginUser = async (credentials: { email: string; password: string }) => {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(credentials),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Giriş işlemi başarısız oldu');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Giriş hatası:', error);
+        throw error;
+    }
+};
+
 export const WelcomeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
+
+    // Kullanıcı girişi veya kaydı için LoginScreen'e yönlendirme
+    const handleAuthNavigation = () => {
+        navigation.navigate('LoginScreen');
+    };
+
+    // Misafir olarak gezinme
+    const handleBrowseAsGuest = () => {
+        navigation.navigate('HomeScreen');
+    };
 
     return (
         <ImageBackground
@@ -27,13 +88,13 @@ export const WelcomeScreen: React.FC = () => {
 
                 <View style={styles.buttonContainer}>
                     <CustomButton
-                        title="LOG IN / SIGN UP"
-                        onPress={() => navigation.navigate('LoginScreen')}
+                        title="GİRİŞ YAP / KAYIT OL"
+                        onPress={handleAuthNavigation}
                         variant="primary"
                     />
                     <CustomButton
-                        title="BROWSE FIRST"
-                        onPress={() => navigation.navigate('HomeScreen')}
+                        title="ÖNCE GÖZ AT"
+                        onPress={handleBrowseAsGuest}
                         variant="secondary"
                     />
                 </View>

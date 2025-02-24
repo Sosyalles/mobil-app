@@ -18,6 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
+import BottomNavigation from '../navigation/BottomNavigation';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -170,7 +171,7 @@ const HomePage: React.FC = () => {
             <Text style={styles.heroTitle}>Hobileriniz artık{'\n'}daha yakın!</Text>
             <CustomButton
               title="Keşfetmeye Başla"
-              onPress={() => { }}
+              onPress={() => navigation.navigate('DiscoverPage')}
               variant="primary"
               style={styles.heroButton}
             />
@@ -250,42 +251,7 @@ const HomePage: React.FC = () => {
       </Animated.ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="home" size={24} color="#FF9F4A" />
-          <Text style={[styles.navLabel, styles.activeNavLabel]}>Ana Sayfa</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="compass-outline" size={24} color="#999999" />
-          <Text style={styles.navLabel}>Keşfet</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => {
-            if (!isAuthenticated) {
-              navigation.navigate('WelcomeScreen');
-            } else {
-              // TODO: Mesajlar sayfasına yönlendir
-            }
-          }}
-        >
-          <Ionicons name="chatbubbles-outline" size={24} color="#999999" />
-          <Text style={styles.navLabel}>Mesajlar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => {
-            if (!isAuthenticated) {
-              navigation.navigate('WelcomeScreen');
-            } else {
-              // TODO: Profil sayfasına yönlendir
-            }
-          }}
-        >
-          <Ionicons name="person-outline" size={24} color="#999999" />
-          <Text style={styles.navLabel}>Profil</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNavigation />
 
       {/* Login Banner */}
       <Animated.View
@@ -324,8 +290,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 48,
-    paddingBottom: 16,
+    paddingTop: 35,
+    paddingBottom: 10,
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
@@ -339,10 +305,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5F5F5',
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 10,
     borderRadius: 25,
     paddingHorizontal: 16,
-    height: 48,
+    height: 40,
   },
   searchIcon: {
     marginRight: 8,
@@ -358,10 +324,10 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     marginHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 16,
     borderRadius: 16,
     overflow: 'hidden',
-    height: 340,
+    height: 300,
   },
   heroImage: {
     width: '100%',
@@ -371,19 +337,19 @@ const styles = StyleSheet.create({
   heroOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
-    padding: 24,
+    padding: 20,
     justifyContent: 'flex-end',
   },
   heroTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 24,
+    marginBottom: 16,
     fontFamily: 'Inter-Bold',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
-    lineHeight: 40,
+    lineHeight: 36,
   },
   heroButton: {
     backgroundColor: '#FF9F4A',
@@ -392,16 +358,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   categoriesSection: {
-    marginBottom: 24,
+    marginBottom: 16,
     backgroundColor: '#FFFFFF',
-    paddingTop: 16,
+    paddingTop: 10,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333333',
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 12,
     fontFamily: 'Inter-SemiBold',
   },
   categoriesGrid: {
@@ -430,7 +396,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
   eventsSection: {
-    marginBottom: 24,
+    marginBottom: 16,
     backgroundColor: '#FFFFFF',
   },
   eventsScrollContent: {
@@ -476,27 +442,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     fontFamily: 'Inter-Regular',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navLabel: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 4,
-    fontFamily: 'Inter-Regular',
-  },
-  activeNavLabel: {
-    color: '#FF9F4A',
-    fontFamily: 'Inter-Medium',
   },
   loginBanner: {
     position: 'absolute',

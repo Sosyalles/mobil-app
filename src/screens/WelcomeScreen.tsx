@@ -27,12 +27,12 @@ export const WelcomeScreen: React.FC = () => {
 
                 <View style={styles.buttonContainer}>
                     <CustomButton
-                        title="LOG IN / SIGN UP"
+                        title="GİRİŞ YAP / KAYIT OL"
                         onPress={() => navigation.navigate('LoginScreen')}
                         variant="primary"
                     />
                     <CustomButton
-                        title="BROWSE FIRST"
+                        title="ÖNCE GÖZ AT"
                         onPress={() => navigation.navigate('HomeScreen')}
                         variant="secondary"
                     />

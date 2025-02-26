@@ -21,6 +21,7 @@ import { RootStackParamList } from '../navigation/types';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Logo } from '../components/Logo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useAuth } from '../context/AuthContext';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'RegisterScreen'>;
 
@@ -32,15 +33,17 @@ export const RegisterScreen: React.FC = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigation = useNavigation<NavigationProp>();
     const buttonScale = new Animated.Value(1);
+    const { register } = useAuth();
 
     const validateForm = (): boolean => {
         // Validation rules
         const nameRegex = /^[A-Za-zÇçĞğİıÖöŞşÜü\s]{2,50}$/;
         const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+        const passwordRegex = /^.{6,}$/; // Sadece minimum 6 karakter olması yeterli
 
         if (!firstName.trim() || !nameRegex.test(firstName)) {
             Alert.alert('Invalid First Name', 'Please enter a valid first name (2-50 characters)');
@@ -63,7 +66,7 @@ export const RegisterScreen: React.FC = () => {
         }
 
         if (!password.trim() || !passwordRegex.test(password)) {
-            Alert.alert('Invalid Password', 'Password must be at least 8 characters long, contain a letter, a number, and a special character');
+            Alert.alert('Geçersiz Şifre', 'Şifre en az 6 karakter uzunluğunda olmalıdır');
             return false;
         }
 
@@ -75,11 +78,37 @@ export const RegisterScreen: React.FC = () => {
         return true;
     };
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         Keyboard.dismiss();
         if (validateForm()) {
-            // TODO: Implement actual registration logic
-            Alert.alert('Success', 'Registration successful!');
+            setLoading(true);
+            try {
+                // AuthContext'teki register fonksiyonunu kullan
+                const success = await register(email, password, `${firstName} ${lastName}`);
+
+                if (success) {
+                    // Kayıt başarılı olduğunda
+                    Alert.alert('Başarılı', 'Kayıt işlemi tamamlandı!', [
+                        {
+                            text: 'Tamam',
+                            onPress: () => {
+                                // Ana sayfaya yönlendirme
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: 'HomeScreen' }],
+                                });
+                            }
+                        }
+                    ]);
+                } else {
+                    // Kayıt başarısız olduğunda
+                    Alert.alert('Hata', 'Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin.');
+                }
+            } catch (error) {
+                Alert.alert('Hata', 'Kayıt işlemi sırasında bir hata oluştu');
+            } finally {
+                setLoading(false);
+            }
         }
     };
 

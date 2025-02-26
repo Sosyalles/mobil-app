@@ -5,6 +5,7 @@ import { theme } from '../theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
+import { useAuth } from '../context/AuthContext';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -47,6 +48,7 @@ const BottomNavigation = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
   const [activeTab, setActiveTab] = React.useState('1');
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const currentRouteName = route.name;
@@ -60,20 +62,24 @@ const BottomNavigation = () => {
     setActiveTab(tab.id);
 
     // Konsola bilgi yazdıralım
-    console.log(`Tab pressed: ${tab.title}, Route: ${tab.route}`);
+    console.log(`NOBRIDGE: Tab pressed: ${tab.title}, Route: ${tab.route}`);
 
-    // Profil ve Mesaj butonlarına tıklandığında WelcomeScreen'e yönlendir
-    if (tab.id === '4' || tab.id === '3') {
+    // Profil ve Mesaj butonları için kullanıcı giriş durumunu kontrol et
+    if ((tab.id === '3' || tab.id === '4') && !isAuthenticated) {
+      // Kullanıcı giriş yapmamışsa WelcomeScreen'e yönlendir
+      console.log(`NOBRIDGE: Kullanıcı giriş yapmamış, WelcomeScreen'e yönlendiriliyor`);
       navigation.navigate('WelcomeScreen');
+      return;
     }
+
     // Sadece mevcut sayfalar için yönlendirme yapalım
-    else if (tab.route === 'HomeScreen' || tab.route === 'DiscoverPage') {
+    if (tab.route === 'HomeScreen' || tab.route === 'DiscoverPage') {
       navigation.navigate(tab.route as keyof RootStackParamList);
     } else {
       // Henüz oluşturulmamış sayfalar için uyarı gösterelim
-      console.log(`${tab.route} sayfası henüz oluşturulmadı`);
+      console.log(`NOBRIDGE: ${tab.route} sayfası henüz oluşturulmadı`);
       // Alternatif olarak ana sayfaya yönlendirebiliriz
-      // navigation.navigate('HomeScreen');
+      navigation.navigate('HomeScreen');
     }
   };
 

@@ -53,7 +53,12 @@ const LoginScreen: React.FC = () => {
         try {
             const success = await login(email, password);
             if (!success) {
-                Alert.alert('Hata', 'Email veya şifre hatalı.');
+                Alert.alert('Giriş Başarısız', 'E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin veya yeni bir hesap oluşturun.');
+            } else {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'HomeScreen' }],
+                });
             }
         } catch (error) {
             Alert.alert('Hata', 'Giriş yapılırken bir hata oluştu.');

@@ -28,6 +28,8 @@ export const RootNavigator = () => {
                 <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
                 <Stack.Screen name="HomeScreen" component={HomePage} />
                 <Stack.Screen name="DiscoverPage" component={DiscoverPage} />
+                <Stack.Screen name="MessagesScreen" component={HomePage} />
+                <Stack.Screen name="ProfileScreen" component={HomePage} />
             </Stack.Navigator>
         </NavigationContainer>
     );

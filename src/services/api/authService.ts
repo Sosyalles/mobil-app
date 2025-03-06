@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.1.89:3000';
+const BASE_URL = 'http://192.168.55.5:3000';
 const API_URL = `${BASE_URL}/api`;
 
 // Axios instance oluştur
@@ -20,6 +20,9 @@ interface User {
     lastName: string;
     isActive: boolean;
     profilePhoto: string | null;
+    photos: string[];
+    city: string;
+    bio: string | null;
     createdAt: string;
     updatedAt: string;
 }

@@ -254,28 +254,30 @@ const HomePage: React.FC = () => {
       <BottomNavigation />
 
       {/* Login Banner */}
-      <Animated.View
-        style={[
-          styles.loginBanner,
-          {
-            transform: [{ translateY: loginBannerTranslateY }],
-            opacity: loginBannerOpacity,
-          },
-        ]}
-      >
-        <View style={styles.loginBannerContent}>
-          <Text style={styles.loginBannerTitle}>Latest hot spots near you</Text>
-          <Text style={styles.loginBannerText}>
-            Get into your account for tickets,{'\n'}recommendations, and more
-          </Text>
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => navigation.navigate('WelcomeScreen')}
-          >
-            <Text style={styles.loginButtonText}>LOG IN / SIGN UP</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+      {!isAuthenticated && (
+        <Animated.View
+          style={[
+            styles.loginBanner,
+            {
+              transform: [{ translateY: loginBannerTranslateY }],
+              opacity: loginBannerOpacity,
+            },
+          ]}
+        >
+          <View style={styles.loginBannerContent}>
+            <Text style={styles.loginBannerTitle}>Latest hot spots near you</Text>
+            <Text style={styles.loginBannerText}>
+              Get into your account for tickets,{'\n'}recommendations, and more
+            </Text>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => navigation.navigate('WelcomeScreen')}
+            >
+              <Text style={styles.loginButtonText}>LOG IN / SIGN UP</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      )}
     </View>
   );
 };

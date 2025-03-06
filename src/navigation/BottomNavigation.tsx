@@ -72,14 +72,12 @@ const BottomNavigation = () => {
       return;
     }
 
-    // Sadece mevcut sayfalar için yönlendirme yapalım
-    if (tab.route === 'HomeScreen' || tab.route === 'DiscoverPage') {
+    // Doğrudan ilgili sayfaya yönlendir
+    try {
       navigation.navigate(tab.route as keyof RootStackParamList);
-    } else {
-      // Henüz oluşturulmamış sayfalar için uyarı gösterelim
-      console.log(`NOBRIDGE: ${tab.route} sayfası henüz oluşturulmadı`);
-      // Alternatif olarak ana sayfaya yönlendirebiliriz
-      navigation.navigate('HomeScreen');
+      console.log(`NOBRIDGE: ${tab.route} sayfasına yönlendirildi`);
+    } catch (error) {
+      console.error(`NOBRIDGE: Navigasyon hatası:`, error);
     }
   };
 

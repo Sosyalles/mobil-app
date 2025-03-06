@@ -11,22 +11,32 @@ type User = {
   lastName: string;
   isActive: boolean;
   profilePhoto: string | null;
+  photos: any[];
+  city: string;
+  bio: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
 type AuthContextType = {
-  isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, name: string) => Promise<boolean>;
-  logout: () => void;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  logout: () => Promise<void>;
+  updateUser: (updatedUser: User) => void;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isAuthenticated: false,
+  login: async () => { },
+  register: async () => { },
+  logout: async () => { },
+  updateUser: () => { },
+});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
@@ -35,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.status === 'success' && response.data) {
         await AsyncStorage.setItem('token', response.data.token);
         setUser(response.data.user);
-        setIsAuthenticated(true);
         return true;
       }
       return false;
@@ -50,16 +59,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
-      const response = await AuthService.register(email, password, name);
+      const response = await AuthService.register(email, password, firstName, lastName);
       if (response.status === 'success' && response.data) {
         // Kayıt başarılı olduktan sonra otomatik giriş yap
         const loginResponse = await AuthService.login(email, password);
         if (loginResponse.status === 'success' && loginResponse.data) {
           await AsyncStorage.setItem('token', loginResponse.data.token);
           setUser(loginResponse.data.user);
-          setIsAuthenticated(true);
           return true;
         }
       }
@@ -84,15 +92,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await AsyncStorage.removeItem('token');
       setUser(null);
-      setIsAuthenticated(false);
     } catch (error) {
       console.error('Çıkış hatası:', error);
       Alert.alert('Hata', 'Çıkış yapılırken bir hata oluştu.');
     }
   };
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        login,
+        register,
+        logout,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

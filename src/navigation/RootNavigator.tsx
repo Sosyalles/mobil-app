@@ -7,6 +7,8 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 import HomePage from '../screens/HomePage';
 import DiscoverPage from '../screens/DiscoverPage';
+import ProfileScreen from '../screens/ProfileScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
 import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -29,7 +31,8 @@ export const RootNavigator = () => {
                 <Stack.Screen name="HomeScreen" component={HomePage} />
                 <Stack.Screen name="DiscoverPage" component={DiscoverPage} />
                 <Stack.Screen name="MessagesScreen" component={HomePage} />
-                <Stack.Screen name="ProfileScreen" component={HomePage} />
+                <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+                <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

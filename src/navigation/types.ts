@@ -9,4 +9,6 @@ export type RootStackParamList = {
   EventsScreen?: undefined;
   ProfileScreen?: undefined;
   EditProfileScreen: undefined;
+  SelectCountryScreen: undefined;
+  SelectCityScreen: undefined;
 }; 

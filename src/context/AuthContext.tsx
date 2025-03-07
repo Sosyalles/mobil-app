@@ -3,7 +3,7 @@ import { AuthService } from '../services/api/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 
-type User = {
+interface User {
   id: number;
   email: string;
   username: string;
@@ -11,76 +11,97 @@ type User = {
   lastName: string;
   isActive: boolean;
   profilePhoto: string | null;
-  photos: any[];
+  photos: string[];
   city: string;
   bio: string | null;
   createdAt: string;
   updatedAt: string;
-};
+  country: string;
+}
 
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  updateUser: (updatedUser: User) => void;
-};
+  updateUser: (user: User) => void;
+}
 
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  login: async () => { },
-  register: async () => { },
-  logout: async () => { },
-  updateUser: () => { },
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await AuthService.login(email, password);
       if (response.status === 'success' && response.data) {
         await AsyncStorage.setItem('token', response.data.token);
-        setUser(response.data.user);
+
+        // Kullanıcı verisini güncelle
+        const userData = {
+          ...response.data.user,
+          country: response.data.user.country || ''
+        };
+
+        setUser(userData);
+        setIsAuthenticated(true);
         return true;
       }
       return false;
     } catch (error: any) {
       console.error('Giriş hatası:', error);
       const errorMessage = error.response?.data?.message || error.message;
-      Alert.alert(
-        'Giriş Başarısız',
-        errorMessage === 'Invalid credentials' ? 'Email veya şifre hatalı.' : 'Giriş yapılırken bir hata oluştu.'
-      );
+
+      let userMessage = 'Giriş yapılırken bir hata oluştu.';
+      if (errorMessage.includes('Invalid credentials')) {
+        userMessage = 'Geçersiz e-posta veya şifre. Lütfen tekrar deneyin.';
+      }
+
+      Alert.alert('Giriş Başarısız', userMessage);
       return false;
     }
   };
 
-  const register = async (email: string, password: string, firstName: string, lastName: string) => {
+  const register = async (email: string, password: string, firstName: string, lastName: string): Promise<boolean> => {
     try {
-      const response = await AuthService.register(email, password, firstName, lastName);
+      console.log(`Registering user with email: ${email}, firstName: ${firstName}, lastName: ${lastName}`);
+
+      // firstName ve lastName'i birleştirerek name oluştur
+      const name = `${firstName} ${lastName}`;
+
+      const response = await AuthService.register(email, password, name);
+
       if (response.status === 'success' && response.data) {
-        // Kayıt başarılı olduktan sonra otomatik giriş yap
-        const loginResponse = await AuthService.login(email, password);
-        if (loginResponse.status === 'success' && loginResponse.data) {
-          await AsyncStorage.setItem('token', loginResponse.data.token);
-          setUser(loginResponse.data.user);
-          return true;
-        }
+        // Kullanıcı verisini güncelle
+        const userData: User = {
+          ...response.data,
+          country: '', // Eğer API'den dönmüyorsa boş string ekleyelim
+        };
+        setUser(userData);
+        setIsAuthenticated(true);
+        return true;
       }
+
+      Alert.alert('Kayıt Başarısız', 'Kayıt işlemi sırasında bir hata oluştu.');
       return false;
     } catch (error: any) {
       console.error('Kayıt hatası:', error);
       const errorMessage = error.response?.data?.message || error.message;
 
       let userMessage = 'Kayıt olurken bir hata oluştu.';
-      if (errorMessage.includes('Email already exists')) {
-        userMessage = 'Bu email adresi zaten kullanımda. Lütfen başka bir email adresi deneyin.';
-      } else if (errorMessage.includes('Username already exists')) {
-        userMessage = 'Bu kullanıcı adı zaten kullanımda. Lütfen başka bir kullanıcı adı deneyin.';
+      if (errorMessage.includes('email already exists')) {
+        userMessage = 'Bu e-posta adresi zaten kullanımda.';
       }
 
       Alert.alert('Kayıt Başarısız', userMessage);
@@ -92,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await AsyncStorage.removeItem('token');
       setUser(null);
+      setIsAuthenticated(false);
     } catch (error) {
       console.error('Çıkış hatası:', error);
       Alert.alert('Hata', 'Çıkış yapılırken bir hata oluştu.');
@@ -106,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated,
         login,
         register,
         logout,
@@ -116,12 +138,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }; 

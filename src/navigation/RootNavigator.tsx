@@ -9,6 +9,8 @@ import HomePage from '../screens/HomePage';
 import DiscoverPage from '../screens/DiscoverPage';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import SelectCountryScreen from '../screens/SelectCountryScreen';
+import SelectCityScreen from '../screens/SelectCityScreen';
 import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -28,6 +30,8 @@ export const RootNavigator = () => {
                 <Stack.Screen name="LoginScreen" component={LoginScreen} />
                 <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
                 <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
+                <Stack.Screen name="SelectCountryScreen" component={SelectCountryScreen} />
+                <Stack.Screen name="SelectCityScreen" component={SelectCityScreen} />
                 <Stack.Screen name="HomeScreen" component={HomePage} />
                 <Stack.Screen name="DiscoverPage" component={DiscoverPage} />
                 <Stack.Screen name="MessagesScreen" component={HomePage} />

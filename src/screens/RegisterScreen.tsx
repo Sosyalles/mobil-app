@@ -79,36 +79,31 @@ export const RegisterScreen: React.FC = () => {
     };
 
     const handleRegister = async () => {
-        Keyboard.dismiss();
-        if (validateForm()) {
-            setLoading(true);
-            try {
-                // AuthContext'teki register fonksiyonunu kullan
-                const success = await register(email, password, `${firstName} ${lastName}`);
+        if (!validateForm()) return;
 
-                if (success) {
-                    // Kayıt başarılı olduğunda
-                    Alert.alert('Başarılı', 'Kayıt işlemi tamamlandı!', [
-                        {
-                            text: 'Tamam',
-                            onPress: () => {
-                                // Ana sayfaya yönlendirme
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: 'HomeScreen' }],
-                                });
-                            }
-                        }
-                    ]);
-                } else {
-                    // Kayıt başarısız olduğunda
-                    Alert.alert('Hata', 'Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin.');
-                }
-            } catch (error) {
-                Alert.alert('Hata', 'Kayıt işlemi sırasında bir hata oluştu');
-            } finally {
-                setLoading(false);
+        setLoading(true);
+        try {
+            console.log('Kayıt işlemi başlatılıyor...');
+            // AuthContext'teki register fonksiyonunu kullan
+            const success = await register(email, password, firstName, lastName);
+            console.log('Kayıt işlemi sonucu:', success);
+
+            if (success) {
+                console.log('Kayıt başarılı, SelectCountryScreen ekranına yönlendiriliyor...');
+                // Kayıt başarılı olduğunda doğrudan SelectCountryScreen'e yönlendir
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'SelectCountryScreen' }],
+                });
+            } else {
+                // Kayıt başarısız olduğunda
+                Alert.alert('Hata', 'Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin.');
             }
+        } catch (error) {
+            console.error('Kayıt hatası:', error);
+            Alert.alert('Hata', 'Kayıt işlemi sırasında bir hata oluştu');
+        } finally {
+            setLoading(false);
         }
     };
 

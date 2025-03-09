@@ -181,6 +181,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await AuthService.updateUserDetail(token, data);
 
       if (result.status === 'success') {
+        // Kullanıcı nesnesini güncelle, bio alanını ekle
+        setUser(prevUser => {
+          if (prevUser) {
+            return {
+              ...prevUser,
+              bio: data.bio || prevUser.bio
+            };
+          }
+          return prevUser;
+        });
+
         Alert.alert('Başarılı', 'Biyografi başarıyla güncellendi.');
         return true;
       }

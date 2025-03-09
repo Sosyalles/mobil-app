@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -12,7 +12,7 @@ import {
     Platform,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +27,15 @@ const ProfileScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const [showSettings, setShowSettings] = useState(false);
     const [showPhotoModal, setShowPhotoModal] = useState(false);
+    const [localUser, setLocalUser] = useState(user);
+
+    // Ekran her odaklandığında kullanıcı verilerini güncelle
+    useFocusEffect(
+        useCallback(() => {
+            console.log('ProfileScreen odaklandı, kullanıcı verileri:', user);
+            setLocalUser(user);
+        }, [user])
+    );
 
     const interests = [
         'Art & Design',
@@ -144,8 +153,16 @@ const ProfileScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     {/* Profile Info */}
-                    <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
-                    <Text style={styles.userBio}>{user?.bio || 'Creative enthusiast | Art lover | Workshop host'}</Text>
+                    <Text style={styles.userName}>{localUser?.firstName} {localUser?.lastName}</Text>
+                    {localUser?.bio ? (
+                        <Text style={styles.userBio}>{localUser.bio}</Text>
+                    ) : (
+                        <TouchableOpacity onPress={() => navigation.navigate('EditProfileScreen')}>
+                            <Text style={[styles.userBio, styles.noBio]}>
+                                Henüz biyografi eklenmemiş. Profil düzenle sayfasından biyografinizi ekleyebilirsiniz.
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                     <View style={styles.locationContainer}>
                         <Ionicons name="location-outline" size={16} color="#666666" />
                         <Text style={styles.locationText}>{user?.city || 'İstanbul'}</Text>
@@ -469,6 +486,9 @@ const styles = StyleSheet.create({
     modalPhoto: {
         width: '100%',
         height: '100%',
+    },
+    noBio: {
+        color: '#FF7F50',
     },
 });
 

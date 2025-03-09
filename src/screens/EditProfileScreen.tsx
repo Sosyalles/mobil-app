@@ -10,6 +10,7 @@ import {
     Platform,
     Modal,
     FlatList,
+    Alert,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -61,7 +62,7 @@ const defaultInterests = [
 ];
 
 const EditProfileScreen: React.FC = () => {
-    const { user, updateUser } = useAuth();
+    const { user, updateProfile, updateUserDetail } = useAuth();
     const navigation = useNavigation<NavigationProp>();
     const [showCountryModal, setShowCountryModal] = useState(false);
     const [showCityModal, setShowCityModal] = useState(false);
@@ -71,12 +72,13 @@ const EditProfileScreen: React.FC = () => {
     const [showPhotoModal, setShowPhotoModal] = useState(false);
     const [showInterestsModal, setShowInterestsModal] = useState(false);
     const [searchInterest, setSearchInterest] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
         username: user?.username || '',
-        bio: 'Creative enthusiast | Art lover | Workshop host',
+        bio: user?.bio || '',
         country: 'Türkiye',
         countryId: 'TR',
         city: 'İstanbul',
@@ -96,18 +98,48 @@ const EditProfileScreen: React.FC = () => {
         !formData.interests.includes(interest)
     );
 
-    const handleSave = () => {
-        // Profil bilgilerini güncelle
-        if (user) {
-            const updatedUser = {
-                ...user,
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                city: formData.city,
-                photos: selectedPhotos
-            };
-            updateUser(updatedUser);
+    const handleSave = async () => {
+        if (!formData.firstName || !formData.lastName) {
+            Alert.alert('Hata', 'Ad ve soyad alanları boş bırakılamaz.');
+            return;
+        }
+
+        // formData değerlerini detaylı loglama
+        console.log('Güncellenecek formData:', {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            bio: formData.bio,
+            bioLength: formData.bio ? formData.bio.length : 0
+        });
+
+        setIsLoading(true);
+
+        try {
+            // 1. Ad ve soyad bilgilerini /users/profile endpointiyle güncelle
+            console.log('Profil bilgilerini güncelleme isteği gönderiliyor...');
+            const profileResponse = await updateProfile({
+                firstName: formData.firstName.trim(),
+                lastName: formData.lastName.trim()
+            });
+
+            console.log('Profil güncelleme yanıtı:', profileResponse);
+
+            // 2. Biyografiyi /users/detail endpointiyle ayrıca güncelle
+            if (formData.bio !== undefined) {
+                console.log('Biyografi bilgilerini güncelleme isteği gönderiliyor...');
+                const bioResponse = await updateUserDetail({
+                    bio: formData.bio.trim()
+                });
+                console.log('Biyografi güncelleme yanıtı:', bioResponse);
+            }
+
+            Alert.alert('Başarılı', 'Profil bilgileriniz başarıyla güncellendi.');
             navigation.goBack();
+        } catch (error) {
+            console.error('Profil güncelleme hatası:', error);
+            Alert.alert('Hata', 'Profil güncellenirken bir hata oluştu.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -116,11 +148,13 @@ const EditProfileScreen: React.FC = () => {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="close-outline" size={28} color="#666" />
+                    <Text style={styles.cancelButton}>İptal</Text>
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Profili Düzenle</Text>
-                <TouchableOpacity onPress={handleSave}>
-                    <Text style={styles.saveButton}>Kaydet</Text>
+                <TouchableOpacity onPress={handleSave} disabled={isLoading}>
+                    <Text style={[styles.saveButton, isLoading && styles.disabledButton]}>
+                        {isLoading ? 'Kaydediliyor...' : 'Kaydet'}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
@@ -189,6 +223,7 @@ const EditProfileScreen: React.FC = () => {
                             value={formData.firstName}
                             onChangeText={(text) => setFormData({ ...formData, firstName: text })}
                             placeholder="Adınız"
+                            placeholderTextColor="#999"
                         />
                     </View>
 
@@ -199,6 +234,7 @@ const EditProfileScreen: React.FC = () => {
                             value={formData.lastName}
                             onChangeText={(text) => setFormData({ ...formData, lastName: text })}
                             placeholder="Soyadınız"
+                            placeholderTextColor="#999"
                         />
                     </View>
 
@@ -210,6 +246,7 @@ const EditProfileScreen: React.FC = () => {
                             onChangeText={(text) => setFormData({ ...formData, username: text })}
                             placeholder="Kullanıcı adınız"
                             autoCapitalize="none"
+                            placeholderTextColor="#999"
                         />
                     </View>
 
@@ -217,10 +254,12 @@ const EditProfileScreen: React.FC = () => {
                         <Text style={styles.label}>Biyografi</Text>
                         <TextInput
                             style={[styles.input, styles.bioInput]}
-                            value={formData.bio}
-                            onChangeText={(text) => setFormData({ ...formData, bio: text })}
-                            placeholder="Kendinizden bahsedin"
+                            placeholder="Kendinizi tanıtın..."
+                            placeholderTextColor="#999"
                             multiline
+                            value={formData.bio || ''}
+                            onChangeText={(text) => setFormData({ ...formData, bio: text })}
+                            editable={true}
                         />
                     </View>
 
@@ -473,6 +512,8 @@ const EditProfileScreen: React.FC = () => {
     );
 };
 
+export default EditProfileScreen;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -486,17 +527,24 @@ const styles = StyleSheet.create({
         paddingTop: Platform.OS === 'ios' ? 50 : 35,
         paddingBottom: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#EEEEEE',
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 17,
         fontWeight: '600',
         color: '#333',
     },
+    cancelButton: {
+        fontSize: 17,
+        color: '#666',
+    },
     saveButton: {
-        fontSize: 16,
+        fontSize: 17,
         color: '#FF7F50',
         fontWeight: '600',
+    },
+    disabledButton: {
+        opacity: 0.5,
     },
     content: {
         flex: 1,
@@ -543,12 +591,12 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#E0E0E0',
-        borderRadius: 12,
-        padding: 12,
+        borderColor: '#EEEEEE',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
         fontSize: 16,
         color: '#333',
-        backgroundColor: '#FAFAFA',
     },
     bioInput: {
         height: 100,
@@ -699,6 +747,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-});
-
-export default EditProfileScreen; 
+    warningText: {
+        color: 'orange',
+        fontSize: 12,
+        marginTop: 5,
+        fontStyle: 'italic'
+    },
+}); 

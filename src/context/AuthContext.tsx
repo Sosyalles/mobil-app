@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext } from 'react';
 import { AuthService } from '../services/api/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import axios from 'axios';
 
 interface User {
   id: number;
@@ -25,7 +26,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  updateUser: (user: User) => void;
+  updateProfile: (data: { firstName: string; lastName: string; bio?: string }) => Promise<boolean>;
+  updateUserDetail: (data: { bio?: string }) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -120,8 +122,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateUser = (updatedUser: User) => {
-    setUser(updatedUser);
+  const updateProfile = async (data: { firstName: string; lastName: string; bio?: string }): Promise<boolean> => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Hata', 'Oturum bulunamadı. Lütfen tekrar giriş yapın.');
+        return false;
+      }
+
+      console.log('Profil güncelleme isteği gönderiliyor:', {
+        ...data,
+        token: 'HIDDEN'
+      });
+
+      const response = await AuthService.updateProfile(token, data);
+
+      console.log('Profil güncelleme yanıtı:', {
+        status: response.status,
+        message: response.message
+      });
+
+      if (response.status === 'success' && response.data) {
+        // Mevcut kullanıcı bilgilerini koru, sadece güncellenen alanları değiştir
+        setUser(prevUser => ({
+          ...prevUser!,
+          ...response.data
+        }));
+        Alert.alert('Başarılı', 'Profiliniz başarıyla güncellendi.');
+        return true;
+      }
+
+      Alert.alert('Hata', response.message || 'Profil güncellenirken bir hata oluştu.');
+      return false;
+    } catch (error: any) {
+      console.error('Profil güncelleme hatası:', error);
+      Alert.alert(
+        'Hata',
+        error.response?.data?.message || 'Profil güncellenirken bir hata oluştu.'
+      );
+      return false;
+    }
+  };
+
+  const updateUserDetail = async (data: { bio?: string }): Promise<boolean> => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Hata', 'Oturum bulunamadı. Lütfen tekrar giriş yapın.');
+        return false;
+      }
+
+      console.log('Kullanıcı detayları güncelleme isteği gönderiliyor:', {
+        ...data,
+        token: 'HIDDEN'
+      });
+
+      // Parametreleri doğru sırayla gönderiyoruz: token, data
+      const result = await AuthService.updateUserDetail(token, data);
+
+      if (result.status === 'success') {
+        Alert.alert('Başarılı', 'Biyografi başarıyla güncellendi.');
+        return true;
+      }
+
+      Alert.alert('Hata', result.message || 'Biyografi güncellenirken bir hata oluştu.');
+      return false;
+    } catch (error) {
+      console.error('Kullanıcı detayları güncelleme hatası:', error);
+      Alert.alert('Hata', 'Biyografi güncellenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      return false;
+    }
   };
 
   return (
@@ -132,7 +202,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
-        updateUser,
+        updateProfile,
+        updateUserDetail,
       }}
     >
       {children}

@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.55.5:3000';
+const BASE_URL = 'http://192.168.1.54:3000';
 
 // Axios instance oluştur
-const axiosInstance = axios.create({
+const api = axios.create({
     baseURL: `${BASE_URL}/api`,
     timeout: 10000,
     headers: {
@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 });
 
 // Axios interceptor ekleyelim - istek ve yanıtları loglamak için
-axiosInstance.interceptors.request.use(
+api.interceptors.request.use(
     (config) => {
         console.log('🚀 API İsteği Gönderiliyor:', {
             url: config.url,
@@ -30,7 +30,7 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-axiosInstance.interceptors.response.use(
+api.interceptors.response.use(
     (response) => {
         console.log('✅ API Yanıtı Alındı:', {
             status: response.status,
@@ -90,10 +90,49 @@ interface RegisterResponse {
     data: User;
 }
 
+interface ProfileUpdateRequest {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    username?: string;
+    bio?: string;
+    city?: string;
+}
+
+interface ProfileUpdateResponse {
+    status: string;
+    message: string;
+    data: User;
+}
+
+interface UserDetail {
+    id: number;
+    userId: number;
+    bio: string | null;
+    location: string | null;
+    interests: string[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface UserDetailUpdateRequest {
+    bio?: string;
+    location?: string;
+    interests?: string[];
+    profilePhoto?: string;
+    profilePhotos?: string[];
+}
+
+interface UserDetailUpdateResponse {
+    status: string;
+    message: string;
+    data: UserDetail;
+}
+
 export class AuthService {
     static async login(email: string, password: string): Promise<LoginResponse> {
         try {
-            const response = await axiosInstance.post('/auth/login', {
+            const response = await api.post('/auth/login', {
                 email,
                 password,
             });
@@ -129,7 +168,7 @@ export class AuthService {
                 data: { ...requestData, password: '***' } // Şifreyi gizleyerek logla
             });
 
-            const response = await axiosInstance.post('/auth/register', requestData);
+            const response = await api.post('/auth/register', requestData);
 
             console.log('Register yanıtı alındı:', {
                 status: response.status,
@@ -147,4 +186,80 @@ export class AuthService {
             throw new Error(`Kayıt işlemi başarısız oldu: ${error.response?.data?.message || error.message}`);
         }
     }
-} 
+
+    static async updateProfile(token: string, data: ProfileUpdateRequest): Promise<ProfileUpdateResponse> {
+        try {
+            // bio değerini detaylar olarak göndermeyi deneyelim
+            const jsonData = JSON.stringify(data);
+
+            console.log('Profil güncelleme isteği gönderiliyor:', {
+                endpoint: '/users/profile',
+                rawData: data,
+                jsonData: jsonData
+            });
+
+            // Bio değerini özel olarak ekleyelim
+            const bioData = data.bio ? { bio: data.bio } : {};
+            console.log('Bio verisi:', bioData);
+
+            const response = await api.patch('/users/profile', jsonData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Ham API Yanıtı:', {
+                status: response.status,
+                headers: response.headers,
+                data: response.data,
+                requestData: jsonData
+            });
+
+            return response.data;
+        } catch (error: any) {
+            console.error('Profil güncelleme hatası:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+                url: error.config?.url,
+                requestData: error.config?.data
+            });
+            throw new Error(`Profil güncellenemedi: ${error.response?.data?.message || error.message}`);
+        }
+    }
+
+    static async updateUserDetail(token: string, data: UserDetailUpdateRequest): Promise<UserDetailUpdateResponse> {
+        try {
+            const jsonData = JSON.stringify(data);
+            console.log('Kullanıcı detayları güncelleme isteği gönderiliyor:', {
+                endpoint: '/users/profile/detail',
+                data: data,
+                jsonData: jsonData
+            });
+
+            const response = await api.patch('/users/profile/detail', jsonData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Kullanıcı detayları güncelleme yanıtı:', {
+                status: response.status,
+                data: response.data
+            });
+
+            return response.data;
+        } catch (error: any) {
+            console.error('Kullanıcı detayları güncelleme hatası:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+                url: error.config?.url,
+                requestData: error.config?.data
+            });
+            throw new Error(`Kullanıcı detayları güncellenemedi: ${error.response?.data?.message || error.message}`);
+        }
+    }
+}

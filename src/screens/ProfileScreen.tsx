@@ -9,6 +9,7 @@ import {
     Modal,
     Pressable,
     Dimensions,
+    Platform,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -78,7 +79,7 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <View style={{ flex: 1 }} />
+                <Text style={styles.headerUsername}>{user?.username}</Text>
                 <TouchableOpacity onPress={() => setShowSettings(true)}>
                     <Ionicons name="settings-outline" size={24} color="#666" />
                 </TouchableOpacity>
@@ -144,7 +145,7 @@ const ProfileScreen: React.FC = () => {
 
                     {/* Profile Info */}
                     <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
-                    <Text style={styles.userBio}>Creative enthusiast | Art lover | Workshop host</Text>
+                    <Text style={styles.userBio}>{user?.bio || 'Creative enthusiast | Art lover | Workshop host'}</Text>
                     <View style={styles.locationContainer}>
                         <Ionicons name="location-outline" size={16} color="#666666" />
                         <Text style={styles.locationText}>{user?.city || 'İstanbul'}</Text>
@@ -237,9 +238,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingTop: 35,
-        paddingBottom: 10,
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'ios' ? 50 : 35,
+        paddingBottom: 15,
+        backgroundColor: '#FFFFFF',
+    },
+    headerUsername: {
+        fontSize: 26,
+        fontWeight: '700',
+        color: '#333',
     },
     content: {
         flex: 1,
